@@ -1,0 +1,19 @@
+{
+  "name": "codingchallenge",
+  "version": "1.0.0",
+  "description": "help.com coding challenge",
+  "main": "main.js",
+  "scripts": {
+    "test": "node main.js"
+  },
+  "keywords": [
+    "TCP",
+    "client"
+  ],
+  "author": "Bill Carter",
+  "license": "ISC",
+  "dependencies": {
+    "net": "^1.0.2",
+    "uuid": "^3.1.0"
+  }
+}
