@@ -103,24 +103,20 @@ var ChallengeClient = function() {
             return;
         }
 
-        if (inData.type == 'msg') {
-            if ('reply' in inData.msg) {
-                var valid = _cidChecker.checkCID(inData.msg.reply);
-                // _pdebug('cid ok ' + valid);
-                if (valid != true) {
-                    console.log('bad cid, bogus reply');
-                    that.emit('badCID', inData.msg.reply);
-                    return;
-                }
-            }
-            else
-                return;
-        }
-
         if ('type' in inData) {
             var type = inData.type;
             if (type == 'heartbeat') {
                 that.heartbeatSeen = Date.now();
+            }
+            else if (type == 'msg') {
+                if ('reply' in inData.msg) {
+                    var cid = inData.msg.reply;
+                    var callback = _cidChecker.checkCID(cid);
+                    // _pdebug('cid ok ' + valid);
+                    if (callback) {
+                        callback(inData);                    
+                    }
+                }
             }
             that.emit(type, inData);
         }
@@ -138,13 +134,12 @@ var ChallengeClient = function() {
 
     // could make this take an array of send objects and loop
     // through them to build a string of '\n'-delimited messages
-    this.send = (sendObj, withCID) => {
+    this.send = (sendObj, callback) => {
         if (_checkConnected() != true)
             return; // could queue up sends?
-        if (withCID) {
-            var id = uuid();
-            _cidChecker.putCID(id);
-            sendObj.id = id;
+        if (callback) {
+            var cid = _cidChecker.putCID(callback);
+            sendObj.id = cid;
         }
         _pdebug('sending: ');
         _pdebug(sendObj);
@@ -186,17 +181,20 @@ var ChallengeClient = function() {
 var CidChecker = function() {
     var cids = {};
 
-    this.putCID = (cid) => {
-        cids[cid] = cid;
+    this.putCID = (callback) => {
+        var cid = uuid();
+        cids[cid] = callback;
+        return(cid);
     }
 
     this.checkCID = (cid) => {
         if (cid in cids) {
+            var callback = cids[cid];
             delete cids[cid];
-            return true;
+            return callback;
         }
         else
-            return false;
+            return null;
     }
 
 }
