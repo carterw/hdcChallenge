@@ -199,12 +199,6 @@ var CidChecker = function() {
 
 }
 
-// var cidChecker = new CidChecker();
-// cidChecker.putCID('2222');
-// var ok = cidChecker.checkCID('22223');
-// ok = cidChecker.checkCID('2222');
-// ok = cidChecker.checkCID('2222');
-
 // extend the EventEmitter class using our ChallengeClient class
 util.inherits(ChallengeClient, EventEmitter);
 module.exports.ChallengeClient = ChallengeClient;
